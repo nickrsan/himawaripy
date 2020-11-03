@@ -21,6 +21,7 @@ near-realtime picture of Earth.
 * GNOME 3
 * Cinnamon 2.8.8
 * KDE
+* Windows 10
 
 ### Not Supported
 * any other desktop environments that are not mentioned above.

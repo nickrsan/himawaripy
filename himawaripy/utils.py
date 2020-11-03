@@ -3,6 +3,10 @@ import re
 import sys
 import subprocess
 from distutils.version import LooseVersion
+import ctypes
+
+if sys.platform == "win32":  # On Windows, we use the registry to set the wallpaper
+    import winreg
 
 
 def set_background(file_path):
@@ -14,6 +18,13 @@ def set_background(file_path):
                          'set theDesktops to a reference to every desktop\n'
                          'repeat with aDesktop in theDesktops\n'
                          'set the picture of aDesktop to \"' + file_path + '"\nend repeat\nend tell'])
+    elif de == "windows":
+        registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)  # open the user registry
+        desktop = winreg.OpenKeyEx(registry, sub_key=r"Control Panel\desktop", reserved=0, access=winreg.KEY_WRITE) # open the "desktop" key with write access
+        winreg.SetValueEx(desktop, "WallpaperStyle", "", winreg.REG_SZ, "9")  # set the preference to make it center and fit the image
+        winreg.FlushKey(desktop)  # make sure the changes were all saved
+        SPI_SETDESKWALLPAPER = 20 
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, file_path , 0)  # actually set the background image
     else:  # Linux
         # gsettings requires it.
         fetch_envvar("DBUS_SESSION_BUS_ADDRESS")

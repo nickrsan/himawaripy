@@ -173,10 +173,15 @@ def thread_main(args):
     for file in iglob(path.join(args.output_dir, "himawari-*.png")):
         os.remove(file)
 
-    output_file = path.join(args.output_dir, strftime("himawari-%Y%m%dT%H%M%S.png", requested_time))
+    if sys.platform == "win32":
+        output_format = "BMP"
+    else:
+        output_format = "PNG"
+        
+    output_file = path.join(args.output_dir, strftime("himawari-%Y%m%dT%H%M%S.{}".format(output_format.lower()), requested_time))
     print("Saving to '%s'..." % (output_file,))
     os.makedirs(path.dirname(output_file), exist_ok=True)
-    png.save(output_file, "PNG")
+    png.save(output_file, output_format)
 
     if not args.dont_change:
         r = set_background(output_file)
